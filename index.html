@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Симулятор Бутербродной</title>
+<style>
+  body{margin:0;overflow:hidden;background:#000;font-family:'Courier New',monospace;user-select:none;}
+  #overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(40,20,10,.95),rgba(0,0,0,.97));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;cursor:pointer;}
+  #overlay h1{font-size:3rem;color:#ffcc00;text-shadow:0 0 18px #ff6600,3px 3px #f00;margin-bottom:1rem;text-align:center;animation:glow 2.4s ease-in-out infinite;}
+  @keyframes glow{50%{text-shadow:0 0 30px #ffaa00,3px 3px #f00;}}
+  #overlay p{font-size:1.05rem;margin:.35rem;color:#ccc;}
+  #overlay .start-hint{margin-top:1.2rem;font-size:1.4rem;color:#00ff00;animation:blink 1s infinite;text-align:center;line-height:1.6;}
+  @keyframes blink{50%{opacity:0;}}
+  #hud{position:absolute;inset:0;pointer-events:none;display:none;z-index:10;}
+  #topbar{position:absolute;top:8px;left:50%;transform:translateX(-50%);display:flex;gap:8px;pointer-events:auto;z-index:20;}
+  #topbar button{background:#1a1a1a;color:#00ff66;border:2px solid #00ff66;border-radius:6px;padding:6px 12px;font-family:inherit;font-size:.9rem;cursor:pointer;}
+  #logpanel{position:fixed;right:8px;bottom:8px;width:40%;max-height:30%;overflow:hidden;background:rgba(0,0,0,.6);color:#99ff99;font-size:11px;line-height:1.35;white-space:pre-wrap;padding:8px;border:1px solid #00ff66;border-radius:6px;z-index:250;display:none;}
+  #help{position:fixed;inset:0;z-index:70;display:none;background:rgba(0,0,0,.85);color:#0f0;font-family:'Courier New',monospace;padding:50px;font-size:14px;line-height:1.6;pointer-events:none;white-space:pre-wrap;}
+  #achpanel{position:fixed;inset:0;z-index:75;display:none;background:rgba(0,0,0,.92);color:#ffcc00;font-family:'Courier New',monospace;padding:60px 80px;font-size:15px;line-height:1.8;overflow:auto;pointer-events:none;}
+  #achpanel h2{color:#ffcc00;text-shadow:0 0 10px #ff6600;}
+  #achpanel .done{color:#00ff66;} #achpanel .locked{color:#666;}
+  #crosshair{position:absolute;top:50%;left:50%;width:8px;height:8px;background:rgba(255,255,255,.9);border-radius:50%;transform:translate(-50%,-50%);border:1px solid #000;}
+  #vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.9) 100%);opacity:0;transition:opacity .45s;}
+  #stats{position:absolute;top:10px;left:10px;color:#fff;font-size:1.15rem;text-shadow:2px 2px #000;}
+  .barwrap{position:absolute;left:10px;width:180px;height:14px;border:2px solid #fff;background:rgba(0,0,0,.5);border-radius:4px;}
+  .barwrap div{height:100%;width:0%;border-radius:2px;}
+  #bladderwrap{top:140px;}#bladderbar{background:#e6d44a;}
+  #shamewrap{top:162px;}#shamebar{background:#ff66aa;}
+  #dirtwrap{top:184px;}#dirtbar{background:#8B5A2B;}
+  #chat{position:absolute;left:10px;bottom:270px;width:340px;pointer-events:none;z-index:15;}
+  #chat div{background:rgba(0,0,0,.55);color:#fff;font-size:12px;padding:3px 6px;margin:2px 0;border-radius:4px;border-left:3px solid #888;opacity:1;transition:opacity 1s;}
+  #chat div.fade{opacity:0;}
+  #facehud{position:absolute;left:10px;bottom:10px;width:246px;height:246px;}
+  #faceframe{position:absolute;inset:0;border:3px solid #666;background:transparent;box-sizing:border-box;}
+  #faceframe::after{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 2px,transparent 2px 4px);}
+  #order-panel{position:absolute;top:10px;right:10px;width:250px;background:rgba(0,0,0,.7);color:#fff;padding:15px;border:3px solid #ffcc00;border-radius:8px;font-size:1rem;}
+  #order-list{display:flex;flex-direction:column-reverse;margin-top:6px;min-height:24px;}
+  #order-list div{padding:2px 4px;margin:1px 0;background:rgba(255,255,255,.08);border-radius:4px;}
+  #interact-hint{position:absolute;bottom:25%;left:50%;transform:translateX(-50%);color:#ffcc00;font-size:1.8rem;font-weight:bold;text-shadow:2px 2px #000;display:none;}
+  #held-item{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);color:#00ff00;font-size:1.3rem;font-weight:bold;text-shadow:2px 2px #000;}
+  #toast{position:absolute;top:30%;left:50%;transform:translateX(-50%);color:#fff;font-size:1.5rem;font-weight:bold;text-shadow:2px 2px #000;background:rgba(0,0,0,.55);padding:10px 20px;border-radius:10px;display:none;max-width:70%;text-align:center;}
+  #minigame{position:absolute;bottom:18%;left:50%;transform:translateX(-50%);width:420px;display:none;text-align:center;}
+  #mg-bar{position:relative;width:100%;height:26px;background:#333;border:3px solid #ffcc00;border-radius:6px;overflow:hidden;}
+  #mg-zone{position:absolute;top:0;height:100%;background:rgba(0,255,0,.45);}
+  #mg-marker{position:absolute;top:0;width:4px;height:100%;background:#f33;}
+  #mg-text{color:#fff;font-size:1.1rem;margin-top:6px;text-shadow:2px 2px #000;}
+  #shop,#compshop{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.92);color:#fff;pointer-events:auto;}
+  #shop h2{color:#ffcc00;font-size:2.2rem;margin:0 0 .4rem;} #shop .shop-money{color:#00ff66;font-size:1.2rem;margin-bottom:.6rem;}
+  #shop button{display:block;margin:5px;padding:10px 16px;width:520px;text-align:left;background:#1a1a1a;color:#00ff66;border:2px solid #00ff66;border-radius:6px;font-family:inherit;font-size:1rem;cursor:pointer;}
+  #shop button:disabled{color:#666;border-color:#444;cursor:default;} #shop button#shop-go{color:#ffcc00;border-color:#ffcc00;text-align:center;font-size:1.25rem;margin-top:14px;}
+  #compshop{background:rgba(0,8,0,.96);color:#33ff33;font-family:'Courier New',monospace;}
+  #compshop::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,255,0,.07) 0 2px,transparent 2px 4px);}
+  #compshop h2{color:#33ff33;text-shadow:0 0 10px #00ff00;font-size:2rem;letter-spacing:4px;margin:0 0 .3rem;}
+  #compshop .shop-money{color:#66ff66;text-shadow:0 0 6px #00ff00;margin-bottom:.8rem;}
+  #compshop button{display:block;margin:5px;padding:10px 16px;width:540px;text-align:left;background:#001400;color:#33ff33;border:2px solid #33ff33;border-radius:0;font-family:inherit;font-size:1rem;cursor:pointer;text-shadow:0 0 5px #00ff00;}
+  #compshop button:hover{background:#003300;} #compshop button#comp-close{color:#ffcc00;border-color:#ffcc00;text-align:center;margin-top:14px;}
+</style>
+</head>
+<body>
+<div id="overlay">
+  <h1 id="overlay-title">🥪 СИМУЛЯТОР БУТЕРБРОДНОЙ 🥪</h1>
+  <p>WASD | Space | Shift-ТОЛЧОК | ЛКМ-оружие/нож/спрей | E-взять/стучать/отвечать/жарить/КОРМИТЬ КОТА | Q-швырнуть | R-отлить</p>
+  <p>СТАРТ: клик / Enter / Space / E / F9. F1-справка | F2-ачивки | F3-лог | F5-дамп | F8-сброс | M-звук</p>
+  <p class="start-hint" id="overlay-hint">[ КЛИКНИ, ЧТОБЫ НАЧАТЬ ]</p>
+</div>
+<div id="hud">
+  <div id="topbar"><button id="btn-download">💾 Лог</button><button id="btn-toggle-log">📜 F3</button><button id="btn-dump">🔍 F5</button><button id="btn-ach">🏆 F2</button></div>
+  <div id="vignette"></div><div id="crosshair"></div>
+  <div id="stats">
+    <div>💰 <span id="money">0</span> ₽</div>
+    <div>📅 День <span id="day">1</span> | ⏰ <span id="daytime">2:30</span></div>
+    <div>⭐ <span id="rep">50</span> | 📊 <span id="status">Открыто</span></div>
+    <div>🏆 <span id="ach">0/25</span></div>
+  </div>
+  <div class="barwrap" id="bladderwrap"><div id="bladderbar"></div></div>
+  <div class="barwrap" id="shamewrap"><div id="shamebar"></div></div>
+  <div class="barwrap" id="dirtwrap"><div id="dirtbar"></div></div>
+  <div id="chat"></div>
+  <div id="facehud"><div id="faceframe"></div></div>
+  <div id="order-panel"><div style="color:#ffcc00;font-weight:bold;">📜 ЗАКАЗ:</div><div id="order-list"><div style="color:#ff9999;">Нет</div></div></div>
+  <div id="interact-hint">[E] Взаимодействовать</div>
+  <div id="held-item"></div><div id="toast"></div>
+  <div id="minigame"><div id="mg-bar"><div id="mg-zone"></div><div id="mg-marker"></div></div><div id="mg-text"></div></div>
+</div>
+<div id="logpanel"></div>
+<div id="achpanel"></div>
+<div id="shop"></div>
+<div id="compshop"></div>
+<div id="help"></div>
+<script type="importmap">
+{ "imports": { "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/","cannon-es":"https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js" } }
+</script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
