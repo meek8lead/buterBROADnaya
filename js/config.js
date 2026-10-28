@@ -2,7 +2,7 @@
 export const CONFIG={GRAVITY:-9.82,STEP:1/60,PLAYER_SPEED:5,PLAYER_ACCEL:12,PLAYER_JUMP:6,PLAYER_RADIUS:0.4,PLAYER_HEIGHT:1.6,EYE_HEIGHT:0.65,
  INTERACT_DISTANCE:3.5,SHOVE_RANGE:2.6,SWING_RANGE:2.0,CUT_RANGE:3.0,SPRAY_RANGE:2.6,DENSITY:60,MIN_MASS:0.6,MAX_MASS:8,GETUP_TIME:1.5,DAY_LENGTH:150,
  SINK_POS:{x:-6.6,y:1,z:1.2},STOVE_POS:{x:-4,y:1,z:1.2},ASSEMBLY_POS:{x:-1.2,y:1,z:1.2},CUT_POS:{x:1.6,y:1,z:1.2},GRINDER_POS:{x:-8.6,y:1,z:-4.5},
- KNIFE_SLOT:{x:3.1,y:1.5,z:1.2},HOOK_POS:{x:3,y:1.4,z:-7.05},GLASS_POS:{x:0,y:1.55,z:3},
+ KNIFE_SLOT:{x:3.1,y:1.5,z:1.2},HOOK_POS:{x:3,y:1.4,z:-7.05},GLASS_POS:{x:0,y:1.55,z:3},RADIO_POS:{x:-3.2,y:1.26,z:3},
  NEST_SPOTS:[{x:-6,z:-13},{x:6,z:-13},{x:-6,z:-9.2},{x:6,z:-9.2},{x:-8.4,z:-0.5},{x:5.6,z:-6},{x:-8,z:13},{x:5,z:13},{x:0,z:-12.5},{x:-3,z:-9.5}],
  ENTRY_DOOR:{x:3,z:15},EXIT_DOOR:{x:10,z:8},CRATE_POS:[{x:-5.8,z:-12.5},{x:5.8,z:-12.5},{x:5.8,z:-10}],
  SHELF_Y:1.0,SHELF_Z:-14,SHELF1_X0:-6.8,SHELF1_X1:-1.2,SHELF2_X0:-0.8,SHELF2_X1:4.6,
@@ -17,11 +17,11 @@ export const CONFIG={GRAVITY:-9.82,STEP:1/60,PLAYER_SPEED:5,PLAYER_ACCEL:12,PLAY
  KITCHEN_SPOTS:[{x:-4,z:0},{x:0,z:0},{x:4,z:0},{x:-4,z:-3},{x:0,z:-3},{x:4,z:-3},{x:0,z:-6},{x:3,z:-6}],
  COLORS:{FLOOR:0x888888,WALL:0xaaaaaa,STORAGE:0x8B5A2B,KITCHEN:0x66aacc,HALL:0xcc8888,COUNTER:0xffcc00,CUT:0x9933cc,ASSEMBLY:0x33cc66}};
 
-export const GAME_DATA={money:0,day:1,status:'Открыто',heldItem:null,bladder:0,shame:0,dirt:0,reputation:50,upgrades:{},stats:{served:0,angry:0,died:0,rats:0,earned:0},kingServed:0,patron:false,eggTaken:false,ach:[],life:{rats:0,served:0,wiped:0,fed:0,sprayed:0,crates:0}};
+export const GAME_DATA={money:0,day:1,status:'Открыто',heldItem:null,bladder:0,shame:0,dirt:0,reputation:50,upgrades:{},stats:{served:0,angry:0,died:0,rats:0,earned:0},kingServed:0,patron:false,eggTaken:false,ach:[],life:{rats:0,served:0,wiped:0,fed:0,sprayed:0,crates:0},reviews:[],tutDone:false};
 
 export const SAVEKEY='buterbrod_save_v1';
 export function loadSave(){try{const s=localStorage.getItem(SAVEKEY);return s?JSON.parse(s):null;}catch(e){return null;}}
-export function storeSave(){try{localStorage.setItem(SAVEKEY,JSON.stringify({money:GAME_DATA.money,day:GAME_DATA.day,rep:GAME_DATA.reputation,up:GAME_DATA.upgrades,egg:!!GAME_DATA.eggTaken,king:GAME_DATA.kingServed||0,patron:!!GAME_DATA.patron,ach:GAME_DATA.ach,life:GAME_DATA.life}));}catch(e){}}
+export function storeSave(){try{localStorage.setItem(SAVEKEY,JSON.stringify({money:GAME_DATA.money,day:GAME_DATA.day,rep:GAME_DATA.reputation,up:GAME_DATA.upgrades,egg:!!GAME_DATA.eggTaken,king:GAME_DATA.kingServed||0,patron:!!GAME_DATA.patron,ach:GAME_DATA.ach,life:GAME_DATA.life,rev:GAME_DATA.reviews.slice(-40),tut:!!GAME_DATA.tutDone}));}catch(e){}}
 export function resetSave(){try{localStorage.removeItem(SAVEKEY);}catch(e){} location.reload();}
 
 export const NAMES=['Витёк','Санёк','Михалыч','Зина','Толян','Гена','Клавдия','Боря','Нюша','Фёдор','Маринка','Степан','Оля','Жора','Тамара','Лёха'];
@@ -85,7 +85,8 @@ export const ITEM_DEFS={
  tool_knife:{id:'tool_knife',kind:'tool',variant:'knife',name:'Нож',color:0xdddddd,shape:'box',p:[0.08,0.06,0.6]},
  tool_mop:{id:'tool_mop',kind:'tool',variant:'mop',name:'Швабра',color:0x997744,shape:'box',p:[0.06,1.3,0.06]},
  tool_spray:{id:'tool_spray',kind:'tool',variant:'spray',name:'Спрей',color:0x22dd55,shape:'cyl',p:[0.1,0.4]},
- tool_cigs:{id:'tool_cigs',kind:'tool',variant:'cigs',name:'Пачка сигарет',color:0xeeeeee,shape:'box',p:[0.12,0.06,0.22]}};
+ tool_cigs:{id:'tool_cigs',kind:'tool',variant:'cigs',name:'Пачка сигарет',color:0xeeeeee,shape:'box',p:[0.12,0.06,0.22]},
+ crown:{id:'crown',kind:'quest',variant:'crown',name:'Корона Короля',color:0xffcc00,shape:'box',p:[0.3,0.12,0.3]}};
 
 export const PHRASES={greet:['Эээ, мне бутер!','Сделай бутерброд мечты!','Я голодный как пылесос!','Мне бутерброд!'],
  happy:['Офигенно!','Лови деньги!','Пять звёзд!','Проглотил с фольгой!'],
@@ -114,6 +115,22 @@ export const PHRASES={greet:['Эээ, мне бутер!','Сделай буте
  sick:['Мне нехорошо...','УООО бунт...','Зачем я это съел...','ЧЕМ ПШИКНУЛ?! УООО...'],
  scared:['АААА! КРЫСА!','ТАРАКАН!!','МАМА!!!','ПОЖАР!!','ДЫМ!','КРЫСА НА НЁМ!!','ДИНАМИТ!!','СВЕТ ПРОПАЛ!!','ЧТО ЭТО ЗА ЗВУК ИЗ ТУАЛЕТА?!'],
  shameStorm:['ФУ! ПОЗОР!','СМОТРИТЕ, ОН ОПОЗОРИЛСЯ!','ЗВОНЮ В САНСЛУЖБУ!!']};
+
+// ==== ШАБЛОНЫ ГЕНЕРАТИВНЫХ ОТЗЫВОВ ====
+export const REVIEW_OPEN=['Заглянул в забегаловку «У Бори».','Зашёл перекусить в бутербродную у дома.','Посетил легендарную «У Бори».','Мне советовали эту точку. Зря советовали, но я пришёл.','Зашёл на бутер — остался на шоу.','Однажды мне сказали: «Хочешь приключений — иди к Боре».'];
+export const REVIEW_FOOD_GOOD=['Бутерброд собрали с душой','Слои лежали ровно, как моя жизнь до этого дня','Хлеб был свежий (насколько это возможно тут)','Котлета хрустела правильно','Соус дали не жалея, но и не топя','Конструкция не развалилась в руках — уважение','Прожарка идеальная, аж слеза'];
+export const REVIEW_FOOD_BAD=['Бутерброд развалился ещё в очереди','Хлеб был жёстче, чем характер моей бывшей','Слои лежали в случайном порядке, как мои долги','Соус лили из глаза, и глаз был плохой','Что-то хрустело. Это было не то, что должно хрустеть','Конструкция шаталась, как курс валют','Мне подали это с лицом человека, который сам это есть не будет'];
+export const REVIEW_WAIT_OK=['Ждал адекватно, успел подумать о вечном.','Обслужили ни быстро и ни медленно, идеально нейтрально.','Очередь шла как надо, претензий по темпу нет.'];
+export const REVIEW_WAIT_BAD=['Ждал так долго, что у меня выросла борода.','Пока ждал, прожил небольшую жизнь и оплатил ипотеку.','Повар двигался как интернет на даче.','Очередь стояла намертво, я состарился и принял это.','Терпение кончилось раньше, чем бутерброд.'];
+export const REVIEW_INCIDENT_RAT=['По залу бегала крыса — атмосфера!','Я видел крысу. Крыса видела меня. Мы всё поняли.','Крыса стырила сыр прямо из-под носа. Профессионально.','Крыса тащила что-то в гнездо. У крысы цели, у меня нет.'];
+export const REVIEW_INCIDENT_VOMIT=['Сосед по очереди внезапно перекрасился.','Санитарный дух ощущался физически.','Кого-то вырвало в зале. Классический понедельник.','Половина очереди дружно побелела. Редкое зрелище.'];
+export const REVIEW_INCIDENT_FIRE=['Немножно горело. Добавило уюта.','Дым был частью рецепта, видимо.','Пожар тушили соусом. Инновация.','Горела плита, горели глаза повара. Эпично.'];
+export const REVIEW_INCIDENT_DIRT=['Пол лип к обуви. Свежий клей?','Столы помнят всех посетителей. И я это видел.','Санитария не их конёк, зато искренность — да.','Грязь лежала слоями, как культурный пласт.'];
+export const REVIEW_INCIDENT_CROWN=['ТАМ БЫЛ КРЫСИНЫЙ КОРОЛЬ И ЕМУ СБИЛИ КОРОНУ. Лучший день в моей жизни.','Я видел летящую корону. Я не платил за этот спектакль, но он окупил всё.','Король орал. Я орал. Орали все.','Корона валялась на полу, и это было самое красивое, что я видел.'];
+export const REVIEW_INCIDENT_RADIO=['Радио орало так, что ноги танцевали сами.','Под хардбасс бутер зашёл на ура.','Радио шипело как бабушкин телевизор. Ностальгия.','Диджей радио явно работал на износ. Уважаю.'];
+export const REVIEW_INCIDENT_CAT=['Кот в смокинге там работает. Сотрудник месяца.','Кот поймал крысу прямо во время заказа. Шоу!','Кот смотрел на меня осуждающе. Я извинился.','Тукседо мурчит как трактор, когда ему дают крысу. Мило.'];
+export const REVIEW_GOOD_END=['Вернусь снова. Наверное.','Пять звёзд, одну снял за запах. Шучу. Четыре с половиной.','Рекомендую врагам и друзьям.','Теперь ем только тут. Мой желудок в терапии, но счастлив.','Боря, держись. Ты молодец, наверное.'];
+export const REVIEW_BAD_END=['Не вернусь. Наверное. Может быть.','Одна звезда, и то из жалости.','Мой юрист свяжется с вами.','Требую моральную компенсацию и бутерброд.','Книга жалоб тряслась, когда я в неё писал.','Заведение закрыто для меня и для моей мечты.'];
 
 export const ACHIEVEMENTS=[
  ['first_serve','Первая продажа','Обслужи первого клиента'],
