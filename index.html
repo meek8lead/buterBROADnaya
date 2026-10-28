@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Симулятор Бутербродной</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🥪</text></svg>">
 <style>
   body{margin:0;overflow:hidden;background:#000;font-family:'Courier New',monospace;user-select:none;}
   #overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(40,20,10,.95),rgba(0,0,0,.97));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:50;cursor:pointer;}
@@ -23,6 +24,9 @@
   #crosshair{position:absolute;top:50%;left:50%;width:8px;height:8px;background:rgba(255,255,255,.9);border-radius:50%;transform:translate(-50%,-50%);border:1px solid #000;}
   #vignette{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.9) 100%);opacity:0;transition:opacity .45s;}
   #stats{position:absolute;top:10px;left:10px;color:#fff;font-size:1.15rem;text-shadow:2px 2px #000;}
+  #money.flashG{animation:mg .6s;} #money.flashR{animation:mr .6s;}
+  @keyframes mg{0%{color:#00ff66;text-shadow:0 0 14px #00ff66;}100%{color:#fff;}}
+  @keyframes mr{0%{color:#ff3333;text-shadow:0 0 14px #ff3333;}100%{color:#fff;}}
   .barwrap{position:absolute;left:10px;width:180px;height:14px;border:2px solid #fff;background:rgba(0,0,0,.5);border-radius:4px;}
   .barwrap div{height:100%;width:0%;border-radius:2px;}
   #bladderwrap{top:140px;}#bladderbar{background:#e6d44a;}
@@ -45,6 +49,14 @@
   #mg-zone{position:absolute;top:0;height:100%;background:rgba(0,255,0,.45);}
   #mg-marker{position:absolute;top:0;width:4px;height:100%;background:#f33;}
   #mg-text{color:#fff;font-size:1.1rem;margin-top:6px;text-shadow:2px 2px #000;}
+  #tutorial{position:fixed;right:10px;bottom:38%;width:270px;background:rgba(0,10,0,.78);border:2px solid #00ff66;border-radius:8px;color:#0f0;font-size:12px;line-height:1.5;padding:10px 12px;z-index:30;display:none;pointer-events:none;}
+  #tutorial b{color:#ffcc00;}
+  #reviews{position:fixed;inset:0;z-index:65;display:none;background:rgba(12,9,4,.97);color:#eee;font-family:'Courier New',monospace;padding:40px 60px;overflow:auto;}
+  #reviews h2{color:#ffcc00;text-shadow:0 0 10px #ff6600;margin-top:0;}
+  #reviews .rev{border:1px solid #554433;border-radius:8px;padding:10px 14px;margin:10px 0;background:rgba(255,255,255,.05);font-size:14px;line-height:1.5;}
+  #reviews .stars{color:#ffcc00;letter-spacing:2px;}
+  #reviews .who{color:#88aaff;} #reviews .day{color:#888;font-size:12px;}
+  #reviews button{display:block;margin:18px auto;padding:12px 30px;background:#1a1a1a;color:#ffcc00;border:2px solid #ffcc00;border-radius:6px;font-family:inherit;font-size:1.2rem;cursor:pointer;}
   #shop,#compshop{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.92);color:#fff;pointer-events:auto;}
   #shop h2{color:#ffcc00;font-size:2.2rem;margin:0 0 .4rem;} #shop .shop-money{color:#00ff66;font-size:1.2rem;margin-bottom:.6rem;}
   #shop button{display:block;margin:5px;padding:10px 16px;width:520px;text-align:left;background:#1a1a1a;color:#00ff66;border:2px solid #00ff66;border-radius:6px;font-family:inherit;font-size:1rem;cursor:pointer;}
@@ -61,7 +73,7 @@
 <div id="overlay">
   <h1 id="overlay-title">🥪 СИМУЛЯТОР БУТЕРБРОДНОЙ 🥪</h1>
   <p>WASD | Space | Shift-ТОЛЧОК | ЛКМ-оружие/нож/спрей | E-взять/стучать/отвечать/жарить/КОРМИТЬ КОТА | Q-швырнуть | R-отлить</p>
-  <p>СТАРТ: клик / Enter / Space / E / F9. F1-справка | F2-ачивки | F3-лог | F5-дамп | F8-сброс | M-звук</p>
+  <p>СТАРТ: клик / Enter / Space / E / F9. F1-справка | F2-ачивки | F3-лог | F5-дамп | F7-скрин | F8-сброс | M-звук</p>
   <p class="start-hint" id="overlay-hint">[ КЛИКНИ, ЧТОБЫ НАЧАТЬ ]</p>
 </div>
 <div id="hud">
@@ -83,8 +95,10 @@
   <div id="held-item"></div><div id="toast"></div>
   <div id="minigame"><div id="mg-bar"><div id="mg-zone"></div><div id="mg-marker"></div></div><div id="mg-text"></div></div>
 </div>
+<div id="tutorial"></div>
 <div id="logpanel"></div>
 <div id="achpanel"></div>
+<div id="reviews"></div>
 <div id="shop"></div>
 <div id="compshop"></div>
 <div id="help"></div>
